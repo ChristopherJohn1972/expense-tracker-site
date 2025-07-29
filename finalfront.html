@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker Pro | All-in-One Financial Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #fca311;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 25px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .app-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .app-logo i {
+            font-size: 2.2rem;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+
+        .app-logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Main content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            height: fit-content;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar h2 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            color: var(--dark);
+            transition: var(--transition);
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content-area {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            min-height: 80vh;
+        }
+
+        /* View containers */
+        .view-container {
+            display: none;
+        }
+
+        .view-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard view */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .welcome-text h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .welcome-text p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card.income {
+            border-left-color: var(--success);
+        }
+
+        .stat-card.expense {
+            border-left-color: var(--danger);
+        }
+
+        .stat-card h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+
+        .stat-card .amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .section-title {
+            margin: 30px 0 20px;
+            font-size: 1.3rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .expense-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .expense-table th, .expense-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .expense-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .expense-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .expense-table .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .action-btn.edit:hover {
+            color: var(--primary);
+        }
+
+        .action-btn.delete:hover {
+            color: var(--danger);
+        }
+
+        .expense-amount {
+            font-weight: 600;
+        }
+
+        .expense-amount.income {
+            color: var(--success);
+        }
+
+        .expense-amount.expense {
+            color: var(--danger);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            height: 300px;
+        }
+
+        /* Receipt Scanner */
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .data-field {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .edit-btn {
+            color: var(--primary);
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--primary);
+            border-radius: 5px;
+            padding: 40px 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .drop-zone:hover {
+            background-color: #e9f5ff;
+        }
+
+        .drop-zone i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .drop-zone p {
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        .d-none {
+            display: none;
+        }
+
+        /* Camera Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 90%;
+            width: 600px;
+            text-align: center;
+        }
+
+        #videoElement {
+            width: 100%;
+            max-height: 400px;
+            background: #333;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .capture-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            transition: var(--transition);
+        }
+
+        .capture-btn:hover {
+            background: var(--secondary);
+        }
+
+        .capture-btn i {
+            margin-right: 8px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .category-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-badge:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .category-badge.active {
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+
+        .food-badge { background: #ffeaa7; color: #d35400; }
+        .travel-badge { background: #74b9ff; color: #1a5276; }
+        .dining-badge { background: #fab1a0; color: #c23616; }
+        .shopping-badge { background: #a29bfe; color: #341f97; }
+        .other-badge { background: #55efc4; color: #006266; }
+
+        /* Responsive design */
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .expense-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .expense-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .category-badges {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div class="app-logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>ExpenseTracker Pro</h1>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="#" class="active" data-view="dashboard">Dashboard</a>
+                <a href="#" data-view="receipt">Receipt Scanner</a>
+                <a href="#" data-view="wallets">Shared Wallets</a>
+                <a href="#" data-view="analytics">Analytics</a>
+                <a href="#" data-view="notifications">Notifications</a>
+            </nav>
+            
+            <div class="user-actions">
+                <div class="user-info">
+                    <div class="user-avatar">JD</div>
+                    <div class="welcome-text">
+                        <div>Chris John</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm" id="logoutBtn">Logout</button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <aside class="sidebar">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active" data-view="dashboard"><i class="fas fa-home"></i> Overview</a></li>
+                    <li><a href="#" data-view="expenses"><i class="fas fa-receipt"></i> Expenses</a></li>
+                    <li><a href="#" data-view="budgets"><i class="fas fa-chart-pie"></i> Budgets</a></li>
+                    <li><a href="#" data-view="reports"><i class="fas fa-file-alt"></i> Reports</a></li>
+                    <li><a href="#" data-view="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+                
+                <h2><i class="fas fa-wallet"></i> Wallets</h2>
+                <ul class="sidebar-menu">
+                    <li><a href="#" data-view="wallets"><i class="fas fa-users"></i> Family Wallet</a></li>
+                    <li><a href="#" data-view="wallets"><i class="fas fa-briefcase"></i> Business</a></li>
+                    <li><a href="#" data-view="wallets"><i class="fas fa-suitcase"></i> Travel Fund</a></li>
+                </ul>
+            </aside>
+            
+            <main class="content-area">
+                <!-- Dashboard View -->
+                <div id="dashboard-view" class="view-container active">
+                    <div class="dashboard-header">
+                        <div class="welcome-text">
+                            <h2>Welcome back, John!</h2>
+                            <p>Here's an overview of your financial activity</p>
+                        </div>
+                        <div>
+                            <button class="btn" id="addExpenseBtn">+ Add Expense</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <h3>Total Balance</h3>
+                            <div class="amount">$4,250.75</div>
+                        </div>
+                        <div class="stat-card income">
+                            <h3>Monthly Income</h3>
+                            <div class="amount">$5,200.00</div>
+                        </div>
+                        <div class="stat-card expense">
+                            <h3>Monthly Expenses</h3>
+                            <div class="amount">$950.25</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="section-title"><i class="fas fa-plus-circle"></i> Add New Expense</h3>
+                    <form class="expense-form" id="expenseForm">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Description" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" class="form-control" placeholder="Amount" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn">Add Expense</button>
+                        </div>
+                    </form>
+                    
+                    <h3 class="section-title"><i class="fas fa-history"></i> Recent Expenses</h3>
+                    <div class="table-responsive">
+                        <table class="expense-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Jul 29, 2023</td>
+                                    <td>Grocery Shopping</td>
+                                    <td>Food</td>
+                                    <td class="expense-amount expense">-$85.30</td>
+                                    <td class="actions">
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Jul 28, 2023</td>
+                                    <td>Salary Deposit</td>
+                                    <td>Income</td>
+                                    <td class="expense-amount income">+$2,500.00</td>
+                                    <td class="actions">
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Jul 27, 2023</td>
+                                    <td>Electricity Bill</td>
+                                    <td>Utilities</td>
+                                    <td class="expense-amount expense">-$120.50</td>
+                                    <td class="actions">
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Jul 25, 2023</td>
+                                    <td>Online Course</td>
+                                    <td>Education</td>
+                                    <td class="expense-amount expense">-$89.99</td>
+                                    <td class="actions">
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3 class="section-title"><i class="fas fa-chart-pie"></i> Spending Overview</h3>
+                    <div class="chart-container">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Receipt Scanner View -->
+                <div id="receipt-view" class="view-container">
+                    <h2 class="section-title"><i class="fas fa-camera"></i> Receipt Scanner</h2>
+                    
+                    <div class="drop-zone" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop receipt image here or</p>
+                        <button id="openCameraBtn" class="btn">Open Camera</button>
+                        <input type="file" id="fileInput" accept="image/*" class="d-none">
+                    </div>
+                    
+                    <div class="preview-container">
+                        <img id="previewImage" class="preview-image" alt="Receipt preview">
+                    </div>
+                    
+                    <div id="parsedDataSection" class="d-none">
+                        <h5 class="section-title"><i class="fas fa-receipt"></i> Receipt Details</h5>
+                        
+                        <div class="data-field">
+                            <span>Merchant:</span>
+                            <span id="merchantValue">Unknown</span>
+                            <span class="edit-btn" onclick="editField('merchant')">✏️</span>
+                        </div>
+                        
+                        <div class="data-field">
+                            <span>Amount:</span>
+                            <span id="amountValue">$0.00</span>
+                            <span class="edit-btn" onclick="editField('amount')">✏️</span>
+                        </div>
+                        
+                        <div class="data-field">
+                            <span>Date:</span>
+                            <span id="dateValue">Today</span>
+                            <span class="edit-btn" onclick="editField('date')">✏️</span>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="form-label">Category:</label>
+                            <div class="category-badges">
+                                <span class="category-badge food-badge" onclick="selectCategory('Groceries')">🛒 Groceries</span>
+                                <span class="category-badge travel-badge" onclick="selectCategory('Transport')">🚕 Transport</span>
+                                <span class="category-badge dining-badge" onclick="selectCategory('Dining')">🍽️ Dining</span>
+                                <span class="category-badge shopping-badge" onclick="selectCategory('Shopping')">🛍️ Shopping</span>
+                                <span class="category-badge other-badge" onclick="selectCategory('Other')">❓ Other</span>
+                            </div>
+                            <select id="categorySelect" class="form-control">
+                                <option value="Groceries">🛒 Groceries</option>
+                                <option value="Transport">🚕 Transport</option>
+                                <option value="Dining">🍽️ Dining</option>
+                                <option value="Shopping">🛍️ Shopping</option>
+                                <option value="Other">❓ Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button id="confirmBtn" class="btn">Confirm & Save</button>
+                            <button id="retakeBtn" class="btn btn-outline">Retake Photo</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Camera Modal -->
+                <div id="cameraModal" class="modal">
+                    <div class="modal-content">
+                        <div class="close-modal" onclick="closeCamera()">&times;</div>
+                        <h3>Take Receipt Photo</h3>
+                        <video id="videoElement" autoplay playsinline></video>
+                        <button id="captureBtn" class="capture-btn"><i class="fas fa-camera"></i> Capture Photo</button>
+                    </div>
+                </div>
+                
+                 <!-- Shared Wallets View -->
+                <div id="wallets-view" class="view-container">
+                    <h2 class="section-title"><i class="fas fa-wallet"></i> Shared Wallets</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3><i class="fas fa-wallet"></i> My Wallets</h3>
+                            <div id="walletsContainer">
+                                <div class="wallet-card">
+                                    <div class="d-flex justify-content-between">
+                                        <h5>Family Expenses</h5>
+                                        <span class="badge admin-badge">Admin</span>
+                                    </div>
+                                    <p>Balance: $1,250.75</p>
+                                    <div class="d-flex justify-content-between">
+                                        <button class="btn btn-outline btn-sm">View Members</button>
+                                        <button class="btn btn-outline btn-sm">Invite Code</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="wallet-card">
+                                    <div class="d-flex justify-content-between">
+                                        <h5>Roommate Shared</h5>
+                                        <span class="badge member-badge">Member</span>
+                                    </div>
+                                    <p>Balance: $420.50</p>
+                                    <div class="d-flex justify-content-between">
+                                        <button class="btn btn-outline btn-sm">View Members</button>
+                                        <button class="btn btn-outline btn-sm">Leave Wallet</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#createWalletModal">
+                                <i class="fas fa-plus"></i> Create New Wallet
+                            </button>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h3><i class="fas fa-user-plus"></i> Join a Wallet</h3>
+                            <div class="input-group mb-3">
+                                <input type="text" id="walletCodeInput" class="form-control" placeholder="Wallet invite code">
+                                <button class="btn btn-success">Join</button>
+                            </div>
+                            
+                            <h4 class="mt-4"><i class="fas fa-envelope"></i> Pending Invitations</h4>
+                            <div id="invitationsContainer">
+                                <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                                    <div>
+                                        <strong>Vacation Fund</strong>
+                                        <div class="text-muted small">Invited by Sarah Smith</div>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-success me-1">Accept</button>
+                                        <button class="btn btn-sm btn-outline">Decline</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analytics View -->
+                <div id="analytics-view" class="view-container">
+                    <h2 class="section-title"><i class="fas fa-chart-bar"></i> Expense Analytics</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h3>$8,450</h3>
+                            <p>Total Expenses</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>$1,280</h3>
+                            <p>Monthly Average</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            <h3>6</h3>
+                            <p>Categories</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <h3>18%</h3>
+                            <p>Savings Rate</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-grid">
+                        <div class="card">
+                            <h3 class="section-title"><i class="fas fa-chart-pie"></i> Spending by Category</h3>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                            
+                            <h3 class="section-title"><i class="fas fa-bullseye"></i> Budget Progress</h3>
+                            <div class="budgets">
+                                <div class="budget-card">
+                                    <div class="budget-header">
+                                        <span class="budget-title">Food & Dining</span>
+                                        <span class="budget-amount">$1,250/$1,500</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="background: #FF9F43; width: 83%"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span>83%</span>
+                                        <span>$250 remaining</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="budget-card">
+                                    <div class="budget-header">
+                                        <span class="budget-title">Travel</span>
+                                        <span class="budget-amount">$2,100/$2,000</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="background: #54a0ff; width: 105%"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span>105%</span>
+                                        <span>Over by $100</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="budget-card">
+                                    <div class="budget-header">
+                                        <span class="budget-title">Shopping</span>
+                                        <span class="budget-amount">$850/$1,000</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="background: #ff6b6b; width: 85%"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span>85%</span>
+                                        <span>$150 remaining</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="budget-card">
+                                    <div class="budget-header">
+                                        <span class="budget-title">Utilities</span>
+                                        <span class="budget-amount">$450/$500</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="background: #1dd1a1; width: 90%"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span>90%</span>
+                                        <span>$50 remaining</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="section-title"><i class="fas fa-chart-bar"></i> Spending Trends</h3>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                            
+                            <h3 class="section-title"><i class="fas fa-chart-line"></i> Monthly Comparison</h3>
+                            <div class="chart-container">
+                                <canvas id="comparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notifications View -->
+                <div id="notifications-view" class="view-container">
+                    <h2 class="section-title"><i class="fas fa-bell"></i> Notification Settings</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="settings-section">
+                                <h4><i class="fas fa-envelope"></i> Budget Threshold Alerts</h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Email Notifications</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="emailAlerts" checked>
+                                        <label class="form-check-label" for="emailAlerts">Enable email alerts</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">SMS Notifications</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="smsAlerts">
+                                        <label class="form-check-label" for="smsAlerts">Enable SMS alerts</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phoneNumber" placeholder="+1234567890">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="settings-section">
+                                <h4><i class="fas fa-sliders-h"></i> Alert Thresholds</h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Warning Level</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="warningThreshold" value="80">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                    <div class="form-text">Receive notification when spending reaches this percentage of budget</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Critical Level</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="criticalThreshold" value="95">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4><i class="fas fa-cog"></i> Notification Preferences</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Categories to Monitor</label>
+                                    <select class="form-control" id="monitoredCategories" multiple>
+                                        <option selected>Groceries</option>
+                                        <option selected>Dining</option>
+                                        <option selected>Shopping</option>
+                                        <option>Transport</option>
+                                        <option>Entertainment</option>
+                                        <option>Utilities</option>
+                                    </select>
+                                    <div class="form-text">Hold Ctrl/Cmd to select multiple</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Notification Frequency</label>
+                                    <select class="form-control" id="notificationFrequency">
+                                        <option value="immediate">Immediately</option>
+                                        <option value="daily" selected>Daily Summary</option>
+                                        <option value="weekly">Weekly Summary</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end mt-3">
+                        <button class="btn" onclick="saveNotificationSettings()">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-links a, .sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const viewId = this.getAttribute('data-view') + '-view';
+                
+                // Hide all views
+                document.querySelectorAll('.view-container').forEach(view => {
+                    view.classList.remove('active');
+                });
+                
+                // Show selected view
+                document.getElementById(viewId).classList.add('active');
+                
+                // Update active link
+                document.querySelectorAll('.nav-links a, .sidebar-menu a').forEach(l => {
+                    l.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Initialize charts
+        function initCharts() {
+            // Expense Chart (Dashboard)
+            const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+            new Chart(expenseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Food', 'Utilities', 'Shopping', 'Entertainment', 'Transport', 'Other'],
+                    datasets: [{
+                        data: [25, 20, 18, 15, 12, 10],
+                        backgroundColor: [
+                            '#FF9F43', '#1dd1a1', '#ff6b6b', '#f368e0', '#54a0ff', '#5f27cd'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Receipt Scanner Functions
+        function initReceiptScanner() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const previewImage = document.getElementById('previewImage');
+            const openCameraBtn = document.getElementById('openCameraBtn');
+            const cameraModal = document.getElementById('cameraModal');
+            const videoElement = document.getElementById('videoElement');
+            const captureBtn = document.getElementById('captureBtn');
+            const parsedDataSection = document.getElementById('parsedDataSection');
+            const retakeBtn = document.getElementById('retakeBtn');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            let stream = null;
+            
+            // File upload handling
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        parsedDataSection.classList.remove('d-none');
+                        
+                        // Simulate parsed data
+                        document.getElementById('merchantValue').textContent = "SuperMart";
+                        document.getElementById('amountValue').textContent = "$" + (Math.random() * 100 + 20).toFixed(2);
+                        document.getElementById('dateValue').textContent = new Date().toLocaleDateString();
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Drag and drop handling
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.backgroundColor = '#e9f5ff';
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.backgroundColor = '';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.backgroundColor = '';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    const file = e.dataTransfer.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        parsedDataSection.classList.remove('d-none');
+                        
+                        // Simulate parsed data
+                        document.getElementById('merchantValue').textContent = "Gas Station";
+                        document.getElementById('amountValue').textContent = "$" + (Math.random() * 80 + 30).toFixed(2);
+                        document.getElementById('dateValue').textContent = new Date().toLocaleDateString();
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Open camera
+            openCameraBtn.addEventListener('click', () => {
+                cameraModal.style.display = 'flex';
+                startCamera();
+            });
+            
+            // Start camera
+            function startCamera() {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then(s => {
+                        stream = s;
+                        videoElement.srcObject = stream;
+                    })
+                    .catch(err => {
+                        console.error("Error accessing camera: ", err);
+                        alert('Could not access the camera. Please make sure you have a camera and have granted permission.');
+                        closeCamera();
+                    });
+            }
+            
+            // Close camera
+            function closeCamera() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                cameraModal.style.display = 'none';
+            }
+            
+            // Capture photo
+            captureBtn.addEventListener('click', () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                
+                // Convert to data URL and set as preview
+                previewImage.src = canvas.toDataURL('image/png');
+                previewImage.style.display = 'block';
+                
+                // Show parsed data section
+                parsedDataSection.classList.remove('d-none');
+                
+                // Simulate parsed data
+                document.getElementById('merchantValue').textContent = "Coffee Shop";
+                document.getElementById('amountValue').textContent = "$" + (Math.random() * 15 + 5).toFixed(2);
+                document.getElementById('dateValue').textContent = new Date().toLocaleDateString();
+                
+                // Close camera
+                closeCamera();
+            });
+            
+            // Retake photo
+            retakeBtn.addEventListener('click', () => {
+                previewImage.style.display = 'none';
+                parsedDataSection.classList.add('d-none');
+                cameraModal.style.display = 'flex';
+                startCamera();
+            });
+            
+            // Confirm and save
+            confirmBtn.addEventListener('click', () => {
+                const merchant = document.getElementById('merchantValue').textContent;
+                const amount = document.getElementById('amountValue').textContent;
+                const date = document.getElementById('dateValue').textContent;
+                const category = document.getElementById('categorySelect').value;
+                
+                alert(`Expense saved!\nMerchant: ${merchant}\nAmount: ${amount}\nDate: ${date}\nCategory: ${category}`);
+                
+                // Reset the form
+                previewImage.style.display = 'none';
+                previewImage.src = '';
+                parsedDataSection.classList.add('d-none');
+            });
+        }
+        
+        // Form submission
+        document.getElementById('expenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Expense added successfully!');
+            this.reset();
+        });
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            initReceiptScanner();
+        });
+        
+        // Helper functions
+        function editField(field) {
+            const currentValue = document.getElementById(`${field}Value`).textContent;
+            const newValue = prompt(`Edit ${field}:`, currentValue);
+            if (newValue !== null) {
+                document.getElementById(`${field}Value`).textContent = newValue;
+            }
+        }
+        
+        function selectCategory(category) {
+            document.getElementById('categorySelect').value = category;
+            
+            // Highlight the selected badge
+            document.querySelectorAll('.category-badge').forEach(badge => {
+                badge.classList.remove('active');
+            });
+            
+            // Find and activate the matching badge
+            const badges = document.querySelectorAll('.category-badge');
+            badges.forEach(badge => {
+                if (badge.textContent.includes(category)) {
+                    badge.classList.add('active');
+                }
+            });
+        }
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to log out?')) {
+                alert('You have been logged out. Redirecting to login...');
+            }
+        });
+    </script>
+</body>
+</html>
